@@ -4,6 +4,10 @@ import datetime
 from django.conf import settings
 from django.db.backends.base.operations import BaseDatabaseOperations
 from django.db.backends import utils
+try:
+    from django.db.backends.utils import typecast_decimal
+except ImportError:
+    from django.db.backends.utils import rev_typecast_decimal as typecast_decimal
 from django.db.utils import DatabaseError
 from django.utils.functional import cached_property
 from django.utils import six
@@ -246,7 +250,7 @@ class DatabaseOperations(BaseDatabaseOperations):
     def convert_decimalfield_value(self, value, expression, connection, context):
         field = expression.field
         val = utils.format_number(value, field.max_digits, field.decimal_places)
-        value = utils.typecast_decimal(val)
+        value = typecast_decimal(val)
         return value
 
     def convert_ipfield_value(self, value, expression, connection, context):
